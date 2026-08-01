@@ -76,7 +76,12 @@ function hmacToken(stationId: string, shiftId: number, expSec: number): string {
 }
 
 const fmtHHMM = (d: Date) =>
-  `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+  new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Asia/Karachi",
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+  }).format(d);
 
 function flipLastChar(s: string): string {
   return s.slice(0, -1) + (s.endsWith("A") ? "B" : "A");

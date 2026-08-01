@@ -4,6 +4,7 @@ import { eq } from "drizzle-orm";
 import { attendanceLog, shifts, staff, stations } from "@/db/schema";
 import { requireAdmin } from "@/lib/admin";
 import { db } from "@/lib/db";
+import { atWallTime, tzNow } from "@/lib/clock";
 import { logDateFor, scanStatus } from "@/lib/window";
 
 export const runtime = "nodejs";
@@ -60,11 +61,10 @@ export async function POST(req: NextRequest) {
   }
 
   const scannedAt = Math.floor(Date.now() / 1000);
-  const shiftStart = new Date();
-  const [h, m] = shift.startTime.split(":").map(Number);
-  shiftStart.setHours(h, m, 0, 0);
+  const now = tzNow();
+  const shiftStart = atWallTime(now, shift.startTime);
   const logDate = logDateFor(shiftStart);
-  const status = scanStatus(new Date(), shiftStart);
+  const status = scanStatus(now, shiftStart);
 
   try {
     const [row] = await db

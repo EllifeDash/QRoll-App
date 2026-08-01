@@ -11,7 +11,8 @@ Day-to-day administration of the attendance system from head office.
 | `HMAC_SECRET` | 32+ random chars; signs QR tokens + admin cookies. Rotating it invalidates all live QR tokens immediately |
 | `ADMIN_PASSWORD` | admin login password (set via `openssl rand -base64 24` or similar) |
 | `APP_URL` | public base URL, e.g. `https://att.example.com` — used in logs/links |
-| `TZ` | timezone for shift window math (shift times are wall-clock local), e.g. `Asia/Karachi`. Set on Vercel too — Node default is UTC |
+
+Timezone: **fixed in code** (`lib/clock.ts` → `Asia/Karachi`), so shift times are always Karachi wall-clock. No `TZ` env var is read — Vercel reserves the `TZ` name and runs Node in UTC, so don't add it there.
 
 ## Station setup (once per PC)
 

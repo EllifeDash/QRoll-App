@@ -1,6 +1,7 @@
 import { and, eq, sql } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
+import { tzNow } from "@/lib/clock";
 import { db } from "@/lib/db";
 import { mintToken } from "@/lib/token";
 import { getActiveWindow, logDateFor, nextWindowAt } from "@/lib/window";
@@ -36,7 +37,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "station_inactive" }, { status: 403 });
   }
 
-  const now = new Date();
+  const now = tzNow();
   const activeShifts = await db.query.shifts.findMany({
     where: (s, { eq }) => eq(s.isActive, true),
   });

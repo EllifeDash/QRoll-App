@@ -29,7 +29,11 @@ function fmtClock(sec: number): string {
 
 function fmtHm(epochSec: number): string {
   const d = new Date(epochSec * 1000);
-  return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  return d.toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: "Asia/Karachi",
+  });
 }
 
 function fmtCountdown(sec: number): string {

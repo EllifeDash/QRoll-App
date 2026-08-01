@@ -1,9 +1,10 @@
 import type { Shift } from "@/db/schema";
+import { atWallTime, wallDateString } from "@/lib/clock";
 
 /**
- * All window math runs against the process timezone (set via TZ env var,
- * e.g. TZ=Asia/Karachi — shift start times are wall-clock local times).
- * `now` is injectable for tests.
+ * All window math runs against Asia/Karachi wall time via lib/clock.ts —
+ * independent of the process timezone (Vercel reserves the `TZ` env var).
+ * `now` is injectable for tests; pass `tzNow()` from lib/clock in routes.
  */
 
 export interface ShiftWindow {
@@ -13,15 +14,8 @@ export interface ShiftWindow {
   shiftStart: Date;
 }
 
-function atTime(date: Date, hhmm: string): Date {
-  const [h, m] = hhmm.split(":").map(Number);
-  const d = new Date(date);
-  d.setHours(h, m, 0, 0);
-  return d;
-}
-
 export function shiftWindowFor(shift: Shift, onDate: Date): ShiftWindow {
-  const shiftStart = atTime(onDate, shift.startTime);
+  const shiftStart = atWallTime(onDate, shift.startTime);
   const windowStart = new Date(
     shiftStart.getTime() - shift.qrStartsMin * 60_000
   );
@@ -59,8 +53,7 @@ export function nextWindowAt(
       candidates.push(today.windowStart);
       continue;
     }
-    const tomorrow = new Date(now);
-    tomorrow.setDate(tomorrow.getDate() + 1);
+    const tomorrow = new Date(now.getTime() + 86_400_000);
     candidates.push(shiftWindowFor(shift, tomorrow).windowStart);
   }
   if (candidates.length === 0) return null;
@@ -69,8 +62,5 @@ export function nextWindowAt(
 
 /** `YYYY-MM-DD` of the shift start — the log date (evening shift crossing midnight logs to start date). */
 export function logDateFor(shiftStart: Date): string {
-  const y = shiftStart.getFullYear();
-  const m = String(shiftStart.getMonth() + 1).padStart(2, "0");
-  const d = String(shiftStart.getDate()).padStart(2, "0");
-  return `${y}-${m}-${d}`;
+  return wallDateString(shiftStart);
 }

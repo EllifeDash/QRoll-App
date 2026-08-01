@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 
 import { db } from "@/lib/db";
 import { verifyToken } from "@/lib/token";
+import { atWallTime, tzNow } from "@/lib/clock";
 import { logDateFor, scanStatus } from "@/lib/window";
 import { attendanceLog, shifts, staff, stations } from "@/db/schema";
 
@@ -63,10 +64,8 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "staff_inactive" }, { status: 403 });
   }
 
-  const now = new Date();
-  const [sh, m] = shift.startTime.split(":").map(Number);
-  const shiftStart = new Date(now);
-  shiftStart.setHours(sh, m, 0, 0);
+  const now = tzNow();
+  const shiftStart = atWallTime(now, shift.startTime);
 
   const logDate = logDateFor(shiftStart);
   const status = scanStatus(now, shiftStart);

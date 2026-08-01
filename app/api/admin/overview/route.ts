@@ -4,7 +4,8 @@ import { count, eq } from "drizzle-orm";
 import { attendanceLog, shifts, staff, stations } from "@/db/schema";
 import { requireAdmin } from "@/lib/admin";
 import { db } from "@/lib/db";
-import { getActiveWindow, nextWindowAt } from "@/lib/window";
+import { tzNow } from "@/lib/clock";
+import { getActiveWindow, logDateFor, nextWindowAt } from "@/lib/window";
 
 export const runtime = "nodejs";
 
@@ -12,7 +13,7 @@ export async function GET(req: NextRequest) {
   const denied = await requireAdmin(req);
   if (denied) return denied;
 
-  const now = new Date();
+  const now = tzNow();
 
   const [stationRows, shiftRows, scanRows, staffRows] = await Promise.all([
     db
@@ -73,11 +74,4 @@ export async function GET(req: NextRequest) {
       staffCount: staffByStation.get(s.id) ?? 0,
     })),
   });
-}
-
-function logDateFor(now: Date): string {
-  const y = now.getFullYear();
-  const m = String(now.getMonth() + 1).padStart(2, "0");
-  const d = String(now.getDate()).padStart(2, "0");
-  return `${y}-${m}-${d}`;
 }

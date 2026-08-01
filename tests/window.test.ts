@@ -1,5 +1,3 @@
-process.env.TZ = "Asia/Karachi";
-
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
@@ -30,19 +28,22 @@ const EVENING: Shift = {
   isActive: true,
 };
 
+/**
+ * Wall-clock time in Asia/Karachi, encoded as a UTC-mislabeled Date
+ * (the same convention lib/clock.ts uses). `getUTCHours()` etc. read the
+ * Karachi wall clock, so assertions are process-TZ independent.
+ */
 function at(date: string, hhmm: string): Date {
-  const d = new Date(`${date}T${hhmm}:00`);
-  return d;
+  const [y, mo, d] = date.split("-").map(Number);
+  const [h, m, s = 0] = hhmm.split(":").map(Number);
+  return new Date(Date.UTC(y, mo - 1, d, h, m, s));
 }
 
 test("shift window spans start minus qrStartsMin to start plus qrEndsMin", () => {
   const w = shiftWindowFor(DAY, at("2026-08-01", "09:00"));
-  assert.equal(w.windowStart.getHours(), 8);
-  assert.equal(w.windowStart.getMinutes(), 15);
-  assert.equal(w.windowEnd.getHours(), 9);
-  assert.equal(w.windowEnd.getMinutes(), 30);
-  assert.equal(w.shiftStart.getHours(), 9);
-  assert.equal(w.shiftStart.getMinutes(), 0);
+  assert.equal(w.windowStart.getTime(), Date.UTC(2026, 7, 1, 8, 15));
+  assert.equal(w.windowEnd.getTime(), Date.UTC(2026, 7, 1, 9, 30));
+  assert.equal(w.shiftStart.getTime(), Date.UTC(2026, 7, 1, 9, 0));
 });
 
 test("getActiveWindow returns null outside any window", () => {
@@ -79,18 +80,14 @@ test("nextWindowAt returns next window start after current day's window closes",
   const now = at("2026-08-01", "09:31");
   const next = nextWindowAt([DAY], now);
   assert.ok(next);
-  assert.equal(next.getDate(), 2);
-  assert.equal(next.getHours(), 8);
-  assert.equal(next.getMinutes(), 15);
+  assert.equal(next.getTime(), Date.UTC(2026, 7, 2, 8, 15));
 });
 
 test("nextWindowAt rolls to tomorrow when no window remains today", () => {
   const now = at("2026-08-01", "23:00");
   const next = nextWindowAt([EVENING], now);
   assert.ok(next);
-  assert.equal(next.getDate(), 2);
-  assert.equal(next.getHours(), 16);
-  assert.equal(next.getMinutes(), 15);
+  assert.equal(next.getTime(), Date.UTC(2026, 7, 2, 16, 15));
 });
 
 test("logDateFor uses the shift-start date", () => {
