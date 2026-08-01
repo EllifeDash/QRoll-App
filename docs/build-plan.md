@@ -67,8 +67,8 @@ Living tracker for implementing the attendance QR system. Statuses: `pending` �
 
 | # | Task | Status | Started | Finished | Done when |
 |---|---|---|---|---|---|
-| 6.1 | Full walkthrough with 2 stations, 3 staff, both shifts (mocked clocks) | pending | | | all scenarios pass: on_time, late, duplicate, offline fallback, manual mark |
-| 6.2 | Security checks: tampered token, expired replay, wrong-station staff, PIN brute force | pending | | | all rejected per `docs/api.md` |
+| 6.1 | Full walkthrough with 2 stations, 3 staff, both shifts (mocked clocks) | done | 2026-08-01 | 2026-08-01 | `npm run test:e2e` — 19 checks: on_time, late, duplicate/replay, wrong-station staff, staff CRUD, offline fallback manual mark, delete |
+| 6.2 | Security checks: tampered token, expired replay, wrong-station staff, PIN brute force | done | 2026-08-01 | 2026-08-01 | `npm run test:e2e` — 400 invalid_token (tampered sig/forged payload), 401 token_expired, 401 unauthorized (no/tampered cookie), 429 locked after 5 attempts |
 | 6.3 | Deploy to Vercel; env vars set; production smoke test | pending | | | live URL kiosk/scan/admin work from phone + PC |
 | 6.4 | Station PC setup procedure verified on one real machine (full-screen autostart) | pending | | | one station running as kiosk at 08:15–09:30 |
 | 6.5 | Update README + operations runbook with any deviations | pending | | | docs match shipped behavior |
@@ -79,3 +79,4 @@ Living tracker for implementing the attendance QR system. Statuses: `pending` �
 - `2026-08-01` — Phase 4 done: `/scan` page (Suspense + `useSearchParams`), `GET /api/scan/info`, staff picker with localStorage identity, success/duplicate/error screens, 400px mobile layout — all live-verified in headless Chrome against Turso.
 - `2026-08-01` — Project renamed **QRoll**.
 - `2026-08-01` — Phase 5 done: admin login (signed cookie + per-IP lockout), overview tile grid (green/amber/red), filtered logs + CSV export, staff/station/shift CRUD (incl. PIN reset), manual marks + delete — all live-verified.
+- `2026-08-01` — Phase 6.1/6.2 done: `tests/e2e.ts` (`npm run test:e2e`) — spawns `next start` on :3100, temp shifts relative to now (clock-independent), 19 scenario + security checks, self-cleaning teardown (logs → staff → shifts by `E2E-*` name pattern).
