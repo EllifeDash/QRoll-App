@@ -1,0 +1,175 @@
+.screen {
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0b0f17;
+  color: #f4f6fb;
+  padding: 16px;
+}
+
+.card {
+  width: 100%;
+  max-width: 420px;
+  background: #131a29;
+  border: 1px solid #232e47;
+  border-radius: 20px;
+  padding: 28px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  text-align: center;
+  box-shadow: 0 16px 64px rgba(0, 0, 0, 0.45);
+}
+
+.stationName {
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.shiftName {
+  color: #9fb0cc;
+  font-size: 1rem;
+}
+
+.expiry {
+  font-size: 0.85rem;
+  color: #f5a623;
+}
+
+.label {
+  text-align: left;
+  font-size: 0.9rem;
+  color: #7d8aa5;
+  margin-top: 4px;
+}
+
+.select {
+  appearance: none;
+  font-size: 1.1rem;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 2px solid #2a3450;
+  background: #0b0f17;
+  color: #f4f6fb;
+  outline: none;
+  cursor: pointer;
+}
+
+.select:focus {
+  border-color: #3b82f6;
+}
+
+.select:disabled {
+  opacity: 0.5;
+}
+
+.button {
+  background: #2563eb;
+  border: none;
+  color: #ffffff;
+  font-size: 1.15rem;
+  font-weight: 600;
+  padding: 16px;
+  border-radius: 14px;
+  cursor: pointer;
+  min-height: 52px;
+}
+
+.button:disabled {
+  background: #1e293b;
+  color: #64748b;
+  cursor: not-allowed;
+}
+
+.button:hover:not(:disabled) {
+  background: #1d4ed8;
+}
+
+.hint {
+  font-size: 0.8rem;
+  color: #55637f;
+}
+
+.muted {
+  color: #7d8aa5;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.title {
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.bigTime {
+  font-size: 2.2rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  margin: 0 auto;
+  border: 4px solid #232e47;
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.checkIcon {
+  width: 72px;
+  height: 72px;
+  margin: 0 auto;
+  border-radius: 50%;
+  background: #14532d;
+  color: #4ade80;
+  border: 2px solid #166534;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.4rem;
+  font-weight: 700;
+}
+
+.successCard {
+  border-color: #166534;
+}
+
+.errorIcon {
+  width: 72px;
+  height: 72px;
+  margin: 0 auto;
+  border-radius: 50%;
+  background: #450a0a;
+  color: #f87171;
+  border: 2px solid #7f1d1d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.dupIcon {
+  width: 72px;
+  height: 72px;
+  margin: 0 auto;
+  border-radius: 50%;
+  background: #1e1b4b;
+  color: #a5b4fc;
+  border: 2px solid #3730a3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: 700;
+}

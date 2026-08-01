@@ -1,36 +1,60 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Station Attendance QR System
 
-## Getting Started
+Staff attendance system for a head office monitoring **11 stations**. Each station PC runs a full-screen kiosk that displays a **rotating QR code** during shift check-in windows. Staff scan the QR with their phone camera, confirm their identity, and their attendance (timestamp + staff ID) is recorded. The admin at head office gets a live dashboard of all stations.
 
-First, run the development server:
+## Why this design
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- **The PC screen is the physical anchor** — to mark attendance you must be physically at the station.
+- **Rotating QR (60s expiry)** defeats screenshot/photo-sharing fraud — a shared photo dies within a minute.
+- **Server issues tokens; the PC only displays them** — station PC clocks are never trusted.
+- **Zero-install for staff** — phone camera → web page → one tap (identity remembered in the browser).
+- **Shift windows are data, not code** — schedule changes are an admin UI edit.
+
+## Stack
+
+| Layer | Choice | Cost |
+|---|---|---|
+| App | Next.js (App Router), deployed on Vercel | Free (Hobby) |
+| Database | Turso (libSQL/SQLite) | Free (5 GB, 500M reads / 10M writes per month) |
+| ORM / migrations | Drizzle ORM + `drizzle-kit` | — |
+| Admin auth | Single password + signed HTTP-only cookie | — |
+| QR rendering | `qrcode` (client-side) | — |
+| Token signing | HMAC-SHA256 (stateless) | — |
+
+## Repo layout
+
+```
+/
+├── README.md
+├── docs/
+│   ├── architecture.md   # system design, flows, decisions
+│   ├── schema.md         # data model
+│   ├── api.md            # endpoint + token specification
+│   ├── operations.md     # admin day-to-day runbook
+│   ├── decisions.md      # brainstorm Q&A log
+│   └── build-plan.md     # live build tracker with timestamps
+└── app/                  # Next.js application
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Quick start
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Create a Turso database: `turso db create attendance` → copy URL + auth token.
+2. Set env vars (see `docs/operations.md` for the full list).
+3. `npm install`, `npm run db:push`, `npm run db:seed`.
+4. `npm run dev` — kiosk at `/kiosk/<stationId>`, scan flow at `/scan?t=…` (admin dashboard ships in Phase 5).
+5. Deploy to Vercel (`vercel deploy`), then set up each station PC as a full-screen kiosk tab.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Pages
 
-## Learn More
+| Page | Who | What |
+|---|---|---|
+| `/kiosk/:stationId` | Station PC | Rotating QR, countdown, offline state, next-window countdown |
+| `/scan?t=…` | Staff phone | Identity picker → mark attendance → confirmation with timestamp |
+| `/admin` | Head office admin | Live station grid, logs, CSV export, CRUD, manual corrections — **planned (Phase 5)** |
 
-To learn more about Next.js, take a look at the following resources:
+## Security posture (summary)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- No RLS in SQLite — **all** DB access goes through validated API routes; the DB credential never reaches the browser.
+- QR token: HMAC-signed, 60s lifetime, bound to station + shift.
+- Admin routes: password login → signed cookie, 7-day expiry.
+- Full threat model: `docs/architecture.md#threat-model`.
