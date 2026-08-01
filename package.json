@@ -1,7 +1,8 @@
 {
-  "name": "station-attendance",
+  "name": "qroll",
   "version": "0.1.0",
   "private": true,
+  "description": "QRoll — station attendance by QR scan: rotating QR kiosk, phone scan page, admin dashboard",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

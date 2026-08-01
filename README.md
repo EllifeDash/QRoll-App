@@ -1,4 +1,4 @@
-# Station Attendance QR System
+# QRoll — Station Attendance QR System
 
 Staff attendance system for a head office monitoring **11 stations**. Each station PC runs a full-screen kiosk that displays a **rotating QR code** during shift check-in windows. Staff scan the QR with their phone camera, confirm their identity, and their attendance (timestamp + staff ID) is recorded. The admin at head office gets a live dashboard of all stations.
 
