@@ -69,7 +69,7 @@ Living tracker for implementing the attendance QR system. Statuses: `pending` �
 |---|---|---|---|---|---|
 | 6.1 | Full walkthrough with 2 stations, 3 staff, both shifts (mocked clocks) | done | 2026-08-01 | 2026-08-01 | `npm run test:e2e` — 19 checks: on_time, late, duplicate/replay, wrong-station staff, staff CRUD, offline fallback manual mark, delete |
 | 6.2 | Security checks: tampered token, expired replay, wrong-station staff, PIN brute force | done | 2026-08-01 | 2026-08-01 | `npm run test:e2e` — 400 invalid_token (tampered sig/forged payload), 401 token_expired, 401 unauthorized (no/tampered cookie), 429 locked after 5 attempts |
-| 6.3 | Deploy to Vercel; env vars set; production smoke test | pending | | | live URL kiosk/scan/admin work from phone + PC |
+| 6.3 | Deploy to Vercel; env vars set; production smoke test | done | 2026-08-01 | 2026-08-01 | live at https://q-roll-app-ten.vercel.app (auto-deploys on push to `main`); prod smoke verified: token/scan happy path, duplicate 409, admin login+overview (11 stations), heartbeat age, CSV export |
 | 6.4 | Station PC setup procedure verified on one real machine (full-screen autostart) | pending | | | one station running as kiosk at 08:15–09:30 |
 | 6.5 | Update README + operations runbook with any deviations | pending | | | docs match shipped behavior |
 
@@ -80,3 +80,16 @@ Living tracker for implementing the attendance QR system. Statuses: `pending` �
 - `2026-08-01` — Project renamed **QRoll**.
 - `2026-08-01` — Phase 5 done: admin login (signed cookie + per-IP lockout), overview tile grid (green/amber/red), filtered logs + CSV export, staff/station/shift CRUD (incl. PIN reset), manual marks + delete — all live-verified.
 - `2026-08-01` — Phase 6.1/6.2 done: `tests/e2e.ts` (`npm run test:e2e`) — spawns `next start` on :3100, temp shifts relative to now (clock-independent), 19 scenario + security checks, self-cleaning teardown (logs → staff → shifts by `E2E-*` name pattern).
+- `2026-08-01` — Repo pushed to GitHub: https://github.com/EllifeDash/QRoll-App (public, branch `main`, linked to Vercel → auto-deploy on push).
+- `2026-08-01` — **Timezone made explicit in code** (`lib/clock.ts`, `Asia/Karachi` via `Intl`): Vercel reserves the `TZ` env var name and runs Node in UTC, so process-TZ window math was unusable there. All window math + log dates now TZ-independent; `TZ` removed from `.env.example`/docs.
+- `2026-08-01` — **Phase 6.3 done** (deploy): prod smoke tests caught + fixed a clock bug — window dates were UTC-mislabeled, leaking +5h into `scanned_at`/heartbeat age/countdowns; fixed to return real instants (`70ddd18`), redeployed, re-verified (drift 3s, heartbeat 0s). Prod DB cleaned after test rows.
+
+## Session handoff (2026-08-01 evening)
+
+State: production live + fully smoke-tested. Working tree clean at `70ddd18`.
+
+Next session — remaining work:
+- **6.4** — station-PC kiosk procedure on a real machine (Chrome `--kiosk --app={URL}`, autostart via Startup shortcut/scheduled task; ops runbook §Station setup). Verify at 08:15–09:30 (Day) or 16:15–17:30 (Evening) Karachi window.
+- **6.5** — README/runbook final pass vs shipped behavior.
+- Optional: `/` landing page is still default create-next-app (Phase 5 deferred it; a login/landing redirect is a nice polish).
+- Credentials: kiosk PIN for `s01` = `1134` (admin → Stations shows all); admin login = `ADMIN_PASSWORD` from `.env`. Demo tip: insert a temp shift covering now to force a live QR window.
