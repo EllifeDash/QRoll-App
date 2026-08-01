@@ -95,55 +95,65 @@ Phone → server. Records attendance.
 
 ## Admin endpoints (require admin cookie)
 
-All admin routes validate the session cookie (signed, HttpOnly, Secure, 7 days). Unauthorized → `401 { "error": "unauthorized" }`.
+All admin routes validate the session cookie `qroll_admin` (signed with HMAC_SECRET, HttpOnly, Secure in prod, SameSite=Lax, 7-day expiry). Unauthorized → `401 { "error": "unauthorized" }`.
 
 ### `POST /api/admin/login`
 ```json
 { "password": "..." }
 ```
-→ `200 { "ok": true }` + sets cookie. Wrong password → `401 { "error": "invalid_password" }`. Brute-force: 5 attempts → 15 min lockout per IP (in-memory map; acceptable at this scale).
+→ `200 { "ok": true }` + sets cookie. Wrong password → `401 { "error": "invalid_password", "remaining": n }`. The 5th failure locks the IP → `429 { "error": "locked", "retryAfterSec": n }` for 15 min (in-memory map; acceptable at this scale).
 
 ### `POST /api/admin/logout`
 Clears cookie.
+
+### `GET /api/admin/session`
+→ `200 { "authenticated": true | false }` (never 401 — used by the login gate).
 
 ### `GET /api/admin/overview`
 Live dashboard payload:
 ```json
 {
+  "now": 1785570000,
+  "qrLive": true,
+  "liveWindow": { "shiftId": 6, "shiftName": "Day", "startTime": "09:00", "windowStart": 1785566100, "windowEnd": 1785570600 },
+  "nextWindowAt": 1785582900,
   "stations": [
     {
       "id": "s03", "name": "Station 3 – North Gate",
-      "heartbeatAgeSec": 40, "qrLive": true,
-      "scanCountToday": 4, "lateCountToday": 1
+      "isActive": true,
+      "heartbeatAt": 1785569960, "heartbeatAgeSec": 40,
+      "scansToday": 4, "staffCount": 2
     }
-  ],
-  "today": "2026-07-31",
-  "shifts": [ { "id": 1, "name": "Day" } ]
+  ]
 }
 ```
-`qrLive` = heartbeat fresh AND a shift window active. Admin derives tile color: red (heartbeat > 120s), amber (live, 0 scans), green (live, scans).
+Admin derives tile color: **red** = station inactive, no heartbeat yet, or heartbeat > 120s · **green** = heartbeat fresh AND `qrLive` AND scans today > 0 · **amber** = otherwise. `nextWindowAt` is null when no shift is configured.
 
-### `GET /api/admin/logs?stationId=&shiftId=&date=&status=`
-Filtered attendance list + totals. Supports CSV via `?format=csv` (Content-Disposition attachment).
+### `GET /api/admin/logs?station=&shift=&status=&date=&format=csv`
+Filtered attendance list joined with station/staff/shift names, newest first, max 500 rows:
+```json
+{ "logs": [ { "id": 9, "stationId": "s03", "stationName": "...", "staffId": 7, "staffName": "...", "shiftId": 1, "shiftName": "Day", "logDate": "2026-07-31", "scannedAt": 1782950471, "status": "on_time", "source": "qr", "note": null } ], "total": 1, "maxRows": 500 }
+```
+`format=csv` returns `text/csv` attachment with the same filters applied.
 
-### `POST /api/admin/staff` · `PUT /api/admin/staff/:id` · `DELETE /api/admin/staff/:id`
-Staff CRUD. Body: `{ stationId, name, isActive }`. Delete is hard delete; prefer `isActive: false` to preserve log FK integrity.
+### `GET /api/admin/staff` · `POST /api/admin/staff` · `PATCH /api/admin/staff/:id`
+Staff CRUD. GET returns `{ staff: [{ id, stationId, stationName, name, isActive }] }` (active first). POST body `{ stationId, name }` → `201 { id }`. PATCH accepts `{ name?, stationId?, isActive? }`. Prefer `isActive: false` over deleting — logs keep the FK.
 
-### `POST /api/admin/stations` · `PUT /api/admin/stations/:id`
-Station CRUD. Body: `{ id?, name, secret?, isActive }`. Changing `secret` forces kiosk re-setup on that station.
+### `POST /api/admin/stations` · `PATCH /api/admin/stations/:id`
+Station CRUD. POST body `{ id, name }` → `201 { id, pin }` (PIN auto-generated, 1000–9999); duplicate id → `409`. PATCH accepts `{ name?, isActive?, resetPin?: true }` — `resetPin` rotates `secret` and returns `{ id, pin }`; the kiosk then fails PIN auth and re-prompts (PIN gate is keyed to the stored PIN).
 
-### `GET /api/admin/shifts` · `POST /api/admin/shifts` · `PUT /api/admin/shifts/:id`
-Shift CRUD. Body: `{ name, startTime, qrStartsMin, qrEndsMin, isActive }`. Edits apply from the next window; logs keep the shift snapshot via FK.
+### `GET /api/admin/shifts` · `POST /api/admin/shifts` · `PATCH /api/admin/shifts/:id`
+Shift CRUD. GET returns `{ shifts: [{ id, name, startTime, qrStartsMin, qrEndsMin, isActive }] }`. POST body `{ name, startTime "HH:MM", qrStartsMin, qrEndsMin, isActive? }` → `201 { id }`. PATCH accepts any subset. Edits apply from the next window; existing logs are unaffected.
 
 ### `POST /api/admin/marks`
 Manual correction (fallback for offline kiosk). Body:
 ```json
-{ "staffId": 7, "shiftId": 1, "logDate": "2026-07-31", "scannedAt": 1782950471, "note": "kiosk offline" }
+{ "stationId": "s03", "staffId": 7, "shiftId": 1, "note": "kiosk offline" }
 ```
-Same validation as `/api/scan` minus token; `source: "manual"`. Duplicate → `409` like above.
+Uses server time: `scanned_at = now`, `status` derived from now vs `start_time`, `log_date` from shift start, `source: "manual"`. Duplicate (same staff+shift+date) → `409 { "error": "already_marked" }`.
 
 ### `DELETE /api/admin/marks/:id`
-Remove an erroneous entry (e.g. wrong person scanned). Last resort — no audit trail beyond `note` (acceptable at this scale).
+Remove an erroneous entry (e.g. wrong person scanned) → `200 { id }`; unknown id → `404`. Last resort — no audit trail beyond `note` (acceptable at this scale).
 
 ## Token spec (internal)
 

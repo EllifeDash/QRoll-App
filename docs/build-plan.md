@@ -54,14 +54,14 @@ Living tracker for implementing the attendance QR system. Statuses: `pending` �
 
 | # | Task | Status | Started | Finished | Done when |
 |---|---|---|---|---|---|
-| 5.1 | Login page + signed cookie; lockout after 5 failures | pending | | | wrong password 6× → locked; correct → cookie set |
-| 5.2 | `/api/admin/overview` + station tile grid (green/amber/red logic) | pending | | | 11 tiles with correct colors for live/offline/no-scan states |
-| 5.3 | Logs table with filters (station/shift/date/status) | pending | | | filters return correct subsets |
-| 5.4 | CSV export | pending | | | file downloads, opens in Excel |
-| 5.5 | Staff CRUD UI | pending | | | add/edit/disable staff reflects in scan picker |
-| 5.6 | Station CRUD UI (incl. PIN reset → kiosk re-prompt) | pending | | | PIN change forces re-entry on kiosk |
-| 5.7 | Shift CRUD UI | pending | | | start_time edit applies to next window only |
-| 5.8 | Manual mark + delete entries (source: manual, note) | pending | | | manual entry appears with `manual` source; delete removes |
+| 5.1 | Login page + signed cookie; lockout after 5 failures | done | 2026-08-01 | 2026-08-01 | wrong pw 5× → 429 locked 15 min (per-IP); correct → HttpOnly cookie; login→/admin redirect live-verified |
+| 5.2 | `/api/admin/overview` + station tile grid (green/amber/red logic) | done | 2026-08-01 | 2026-08-01 | 11 tiles live: s01 green (hb+scan), s02 amber (hb), s03 red (no hb); 30s auto-poll |
+| 5.3 | Logs table with filters (station/shift/date/status) | done | 2026-08-01 | 2026-08-01 | joined names, newest first, 500 cap; status=late filter → empty state verified |
+| 5.4 | CSV export | done | 2026-08-01 | 2026-08-01 | `format=csv` → text/csv attachment, same filters; download via blob link |
+| 5.5 | Staff CRUD UI | done | 2026-08-01 | 2026-08-01 | add (201), disable, move station (PATCH) — all live-tested |
+| 5.6 | Station CRUD UI (incl. PIN reset → kiosk re-prompt) | done | 2026-08-01 | 2026-08-01 | create returns PIN, dup → 409, resetPin rotates secret; kiosk re-prompts because stored PIN no longer matches |
+| 5.7 | Shift CRUD UI | done | 2026-08-01 | 2026-08-01 | create (201) + activate/deactivate + start_time edit (applies next window) |
+| 5.8 | Manual mark + delete entries (source: manual, note) | done | 2026-08-01 | 2026-08-01 | manual mark 201 (status derived from server time), dup → 409, delete → 200, re-delete → 404 |
 
 ## Phase 6 — E2E validation
 
@@ -77,3 +77,5 @@ Living tracker for implementing the attendance QR system. Statuses: `pending` �
 
 - `2026-07-31` — plan created per `docs/decisions.md` §1–9 and the Q&A locked earlier.
 - `2026-08-01` — Phase 4 done: `/scan` page (Suspense + `useSearchParams`), `GET /api/scan/info`, staff picker with localStorage identity, success/duplicate/error screens, 400px mobile layout — all live-verified in headless Chrome against Turso.
+- `2026-08-01` — Project renamed **QRoll**.
+- `2026-08-01` — Phase 5 done: admin login (signed cookie + per-IP lockout), overview tile grid (green/amber/red), filtered logs + CSV export, staff/station/shift CRUD (incl. PIN reset), manual marks + delete — all live-verified.

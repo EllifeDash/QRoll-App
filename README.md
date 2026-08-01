@@ -41,7 +41,7 @@ Staff attendance system for a head office monitoring **11 stations**. Each stati
 1. Create a Turso database: `turso db create attendance` → copy URL + auth token.
 2. Set env vars (see `docs/operations.md` for the full list).
 3. `npm install`, `npm run db:push`, `npm run db:seed`.
-4. `npm run dev` — kiosk at `/kiosk/<stationId>`, scan flow at `/scan?t=…` (admin dashboard ships in Phase 5).
+4. `npm run dev` — kiosk at `/kiosk/<stationId>`, scan flow at `/scan?t=…`, admin at `/admin`.
 5. Deploy to Vercel (`vercel deploy`), then set up each station PC as a full-screen kiosk tab.
 
 ## Pages
@@ -50,7 +50,7 @@ Staff attendance system for a head office monitoring **11 stations**. Each stati
 |---|---|---|
 | `/kiosk/:stationId` | Station PC | Rotating QR, countdown, offline state, next-window countdown |
 | `/scan?t=…` | Staff phone | Identity picker → mark attendance → confirmation with timestamp |
-| `/admin` | Head office admin | Live station grid, logs, CSV export, CRUD, manual corrections — **planned (Phase 5)** |
+| `/admin` | Head office admin | Live station grid, logs + CSV export, staff/station/shift CRUD, manual corrections |
 
 ## Security posture (summary)
 

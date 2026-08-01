@@ -1,0 +1,312 @@
+.screen {
+  min-height: 100dvh;
+  background: #0b0f17;
+  color: #f4f6fb;
+  padding: 24px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.pageTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.muted {
+  color: #7d8aa5;
+  font-size: 0.95rem;
+}
+
+.ghostButton {
+  background: transparent;
+  border: 1px solid #2a3450;
+  color: #9fb0cc;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.ghostButton:hover {
+  border-color: #3b82f6;
+  color: #f4f6fb;
+}
+
+.loginScreen {
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0b0f17;
+  padding: 16px;
+}
+
+.loginCard {
+  width: 100%;
+  max-width: 380px;
+  background: #131a29;
+  border: 1px solid #232e47;
+  border-radius: 20px;
+  padding: 32px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: 0 16px 64px rgba(0, 0, 0, 0.45);
+}
+
+.loginTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.loginHint {
+  text-align: center;
+  color: #7d8aa5;
+  font-size: 0.9rem;
+  margin-top: -8px;
+}
+
+.input {
+  font-size: 1.05rem;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 2px solid #2a3450;
+  background: #0b0f17;
+  color: #f4f6fb;
+  outline: none;
+}
+
+.input:focus {
+  border-color: #3b82f6;
+}
+
+.errorText {
+  color: #f87171;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.button {
+  background: #2563eb;
+  border: none;
+  color: #ffffff;
+  font-size: 1.05rem;
+  font-weight: 600;
+  padding: 14px;
+  border-radius: 14px;
+  cursor: pointer;
+}
+
+.button:disabled {
+  background: #1e293b;
+  color: #64748b;
+  cursor: not-allowed;
+}
+
+.button:hover:not(:disabled) {
+  background: #1d4ed8;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
+}
+
+.tile {
+  background: #131a29;
+  border: 1px solid #232e47;
+  border-left: 4px solid #55637f;
+  border-radius: 14px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.tile.green {
+  border-left-color: #22c55e;
+}
+
+.tile.amber {
+  border-left-color: #f5a623;
+}
+
+.tile.red {
+  border-left-color: #ef4444;
+}
+
+.tileHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.tileName {
+  font-weight: 600;
+  font-size: 0.98rem;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex: none;
+}
+
+.dot.green {
+  background: #22c55e;
+  box-shadow: 0 0 8px rgba(34, 197, 94, 0.7);
+}
+
+.dot.amber {
+  background: #f5a623;
+  box-shadow: 0 0 8px rgba(245, 166, 35, 0.7);
+}
+
+.dot.red {
+  background: #ef4444;
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.7);
+}
+
+.tileStatus {
+  font-size: 0.85rem;
+  color: #9fb0cc;
+}
+
+.tileMeta {
+  font-size: 0.8rem;
+  color: #7d8aa5;
+}
+
+.logsSection {
+  margin-top: 28px;
+}
+
+.sectionTitle {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 14px;
+  align-items: center;
+}
+
+.tableWrap {
+  overflow-x: auto;
+  border: 1px solid #232e47;
+  border-radius: 12px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+  min-width: 760px;
+}
+
+.table th {
+  text-align: left;
+  padding: 10px 12px;
+  color: #7d8aa5;
+  font-weight: 600;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid #232e47;
+  background: #101725;
+}
+
+.table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #1a2236;
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+.num {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.badgeGreen {
+  background: #14532d;
+  color: #4ade80;
+  border: 1px solid #166534;
+}
+
+.badgeAmber {
+  background: #431407;
+  color: #fbbf24;
+  border: 1px solid #78350f;
+}
+
+.notice {
+  color: #4ade80;
+  font-size: 0.9rem;
+  margin-bottom: 14px;
+}
+
+.link {
+  background: none;
+  border: none;
+  color: #3b82f6;
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 2px 4px;
+}
+
+.dangerLink {
+  background: none;
+  border: none;
+  color: #f87171;
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 2px 4px;
+}
+
+.dangerLink:hover {
+  text-decoration: underline;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+.inlineSelect {
+  background: #0b0f17;
+  color: #f4f6fb;
+  border: 1px solid #2a3450;
+  border-radius: 8px;
+  padding: 6px 8px;
+  font-size: 0.85rem;
+  max-width: 180px;
+}
